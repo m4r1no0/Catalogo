@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo · Editar imágenes</title>
+  <!-- Font Awesome (iconos) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #f4f7fc;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .app {
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 2rem;
+      color: #0b2b4a;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      color: #3a5a7a;
+      margin-bottom: 2rem;
+      border-left: 4px solid #2a7de1;
+      padding-left: 1rem;
+      font-weight: 400;
+    }
+
+    /* grilla de productos */
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2rem;
+    }
+
+    .seccion-productos {
+      margin-top: 3rem;
+    }
+
+    .seccion-productos h2 {
+      color: #0b2b4a;
+      margin-bottom: 0.35rem;
+    }
+
+    .seccion-descripcion {
+      color: #536f8b;
+      margin-bottom: 1.25rem;
+    }
+
+    .acciones-seccion {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-ruanas {
+      display: none;
+    }
+
+    .estado-ruanas {
+      color: #536f8b;
+      font-size: 0.9rem;
+    }
+
+    .producto-card {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
+      padding: 1.25rem 1.25rem 1.5rem;
+      transition: transform 0.1s ease, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .producto-card:hover {
+      box-shadow: 0 20px 36px rgba(0, 20, 50, 0.08);
+      transform: translateY(-3px);
+    }
+
+    /* contenedor de imagen */
+    .imagen-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #f0f4fa;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      border: 1px solid #e9edf4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .imagen-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .imagen-placeholder {
+      color: #8ba0bc;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .imagen-placeholder i {
+      font-size: 2.6rem;
+      color: #b6cbdf;
+    }
+
+    /* badge de edición */
+    .edit-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(20, 40, 70, 0.75);
+      backdrop-filter: blur(4px);
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      letter-spacing: 0.3px;
+    }
+
+    .edit-badge i {
+      font-size: 0.9rem;
+    }
+
+    .edit-badge:hover {
+      background: #1f3a5f;
+      transform: scale(1.02);
+    }
+
+    .nombre-producto {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #1a2e44;
+      margin: 0.3rem 0 0.1rem;
+    }
+
+    .precio {
+      color: #2a6b9c;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0.2rem 0 0.4rem;
+    }
+
+    .descripcion {
+      color: #536f8b;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+    }
+
+    /* modal recortar / editar imagen */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: white;
+      max-width: 680px;
+      width: 92%;
+      border-radius: 40px;
+      padding: 2rem 2rem 2.2rem;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      font-weight: 600;
+      color: #0b2b4a;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .modal h2 i {
+      color: #2a7de1;
+    }
+
+    .modal .producto-nombre {
+      color: #3a5a7a;
+      font-weight: 400;
+      font-size: 1rem;
+      margin-top: -0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .area-edicion {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .crop-container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1/1;
+      background: #eef2f8;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 2px dashed #c0d0e2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .crop-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #fafcff;
+    }
+
+    .crop-container .placeholder-crop {
+      color: #8ba0bc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .controles-crop {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .btn-crop {
+      background: #eef3fa;
+      border: none;
+      padding: 0.55rem 1.2rem;
+      border-radius: 60px;
+      font-weight: 500;
+      color: #1a3d5e;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: 0.12s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      border: 1px solid transparent;
+    }
+
+    .btn-crop i {
+      font-size: 1rem;
+      color: #2f6b9e;
+    }
+
+    .btn-crop:hover {
+      background: #e3eaf5;
+      border-color: #b7cde0;
+    }
+
+    .btn-crop.primary {
+      background: #1f4e7a;
+      color: white;
+      box-shadow: 0 6px 14px rgba(26, 80, 140, 0.25);
+    }
+
+    .btn-crop.primary i {
+      color: white;
+    }
+
+    .btn-crop.primary:hover {
+      background: #123a5e;
+    }
+
+    .acciones-modal {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-cerrar {
+      background: transparent;
+      border: 1px solid #d0dbe8;
+      padding: 0.6rem 1.6rem;
+      border-radius: 60px;
+      font-weight: 500;
+      color: #2e4b6b;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .btn-cerrar:hover {
+      background: #f0f4fc;
+    }
+
+    .file-input-hidden {
+      display: none;
+    }
+
+    /* mensaje feedback */
+    .toast-msg {
+      background: #1d3d5e;
+      color: white;
+      padding: 0.5rem 1.4rem;
+      border-radius: 60px;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: 0.25s;
+      pointer-events: none;
+      z-index: 999;
+      backdrop-filter: blur(4px);
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      bottom: 2.8rem;
+    }
+
+    @media (max-width: 480px) {
+      .modal { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1><i class="fas fa-boxes" style="color: #1f5c9e;"></i> Catálogo</h1>
+    <div class="subtitle">Edita las imágenes de cada producto · sube y recorta</div>
+  </header>
+
+  <div class="catalogo" id="catalogo"></div>
+
+  <section class="seccion-productos" aria-labelledby="tituloRuanas">
+    <h2 id="tituloRuanas"><i class="fas fa-hat-cowboy"></i> Ruanas</h2>
+    <p class="seccion-descripcion">Agrega aquí las imágenes de tus nuevos productos.</p>
+    <div class="acciones-seccion">
+      <label class="btn-crop primary" for="inputRuanas">
+        <i class="fas fa-folder-open"></i> Cargar imágenes de ruanas
+      </label>
+      <input class="input-ruanas" id="inputRuanas" type="file" accept="image/*" multiple webkitdirectory>
+      <span class="estado-ruanas" id="estadoRuanas">Aún no hay imágenes cargadas</span>
+    </div>
+    <div class="catalogo" id="catalogoRuanas"></div>
+  </section>
+
+  <section class="seccion-productos" aria-labelledby="tituloPonchos">
+    <h2 id="tituloPonchos"><i class="fas fa-mountain"></i> Ponchos</h2>
+    <p class="seccion-descripcion">Productos cargados desde la carpeta ponchos.</p>
+    <div class="catalogo" id="catalogoPonchos"></div>
+  </section>
+</div>
+
+<!-- Modal de edición de imagen -->
+<div class="modal-overlay" id="modalEditar">
+  <div class="modal">
+    <div>
+      <h2><i class="fas fa-crop-alt"></i> Editar imagen</h2>
+      <div class="producto-nombre" id="modalProductoNombre">Producto</div>
+    </div>
+
+    <div class="area-edicion">
+      <div class="crop-container" id="cropContainer">
+        <img id="cropPreview" src="" alt="vista previa">
+        <div class="placeholder-crop" id="cropPlaceholder">
+          <i class="fas fa-image" style="font-size: 3rem; color:#b2c9e0;"></i>
+          <span>Sin imagen</span>
+        </div>
+      </div>
+
+      <div class="controles-crop">
+        <button class="btn-crop" id="btnSubirImagen"><i class="fas fa-upload"></i> Subir</button>
+        <button class="btn-crop" id="btnRecortar"><i class="fas fa-crop"></i> Recortar</button>
+        <button class="btn-crop" id="btnResetear"><i class="fas fa-undo-alt"></i> Restaurar</button>
+      </div>
+    </div>
+
+    <div class="acciones-modal">
+      <button class="btn-cerrar" id="btnCerrarModal">Cerrar</button>
+      <button class="btn-crop primary" id="btnAplicarEdicion"><i class="fas fa-check"></i> Aplicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast feedback -->
+<div class="toast-msg" id="toastMsg">✓ Imagen actualizada</div>
+
+<script>
+  (function() {
+    // ----- Datos de ejemplo (catálogo) -----
+    const productosData = [
+      { id: 1, nombre: "Auriculares ANC", precio: "$89.90", descripcion: "Cancelación de ruido, 40h batería", imagen: "sombreros/aguadeno .jpeg" },
+      { id: 2, nombre: "Smartband Pro", precio: "$49.00", descripcion: "Monitor cardíaco, GPS, resistente", imagen: "sombreros/aguadeno 19.jpeg" },
+      { id: 3, nombre: "Costeño contramarcado 21 vueltas", precio: "$250.000", descripcion: "Sombrero costeño contramarcado original", imagen: "sombreros/aguadeno 21.jpeg" },
+      { id: 4, nombre: "Mochila Urbana", precio: "$74.20", descripcion: "Impermeable, 20L, acolchada", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.54.jpeg" },
+      { id: 5, nombre: "Producto 05", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.55.jpeg" },
+      { id: 6, nombre: "Producto 06", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.56.jpeg" },
+      { id: 7, nombre: "Producto 07", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.57.jpeg" },
+      { id: 8, nombre: "Producto 08", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.58 (1).jpeg" },
+      { id: 9, nombre: "Producto 09", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.58.jpeg" },
+      { id: 10, nombre: "Producto 10", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.59.jpeg" },
+      { id: 11, nombre: "Producto 11", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.00.jpeg" },
+      { id: 12, nombre: "Producto 12", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.01.jpeg" },
+      { id: 13, nombre: "Producto 13", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.02.jpeg" },
+      { id: 14, nombre: "Producto 14", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.03 (1).jpeg" },
+      { id: 15, nombre: "Producto 15", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.03.jpeg" },
+      { id: 16, nombre: "Producto 16", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.04.jpeg" },
+      { id: 17, nombre: "Producto 17", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.05.jpeg" },
+      { id: 18, nombre: "Producto 18", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.06.jpeg" },
+      { id: 19, nombre: "Producto 19", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.07 (1).jpeg" },
+      { id: 20, nombre: "Producto 20", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.07.jpeg" },
+      { id: 21, nombre: "Producto 21", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.09 (1).jpeg" },
+      { id: 22, nombre: "Producto 22", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.09.jpeg" },
+      { id: 23, nombre: "Producto 23", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.10.jpeg" },
+      { id: 24, nombre: "Producto 24", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.11 (1).jpeg" },
+      { id: 25, nombre: "Producto 25", precio: "Consultar", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.11.jpeg" },
+    ];
+
+    // Estado de imágenes (base64) por producto: almacenamos la imagen actual
+    // clave: id del producto, valor: string base64 (o null si es la imagen original)
+    const imagenesEditadas = new Map(); // id -> base64
+
+    // ---------- renderizar catálogo ----------
+    const catalogoEl = document.getElementById('catalogo');
+    const catalogoRuanasEl = document.getElementById('catalogoRuanas');
+    const catalogoPonchosEl = document.getElementById('catalogoPonchos');
+    const inputRuanas = document.getElementById('inputRuanas');
+    const estadoRuanas = document.getElementById('estadoRuanas');
+    const ruanasData = [
+      { nombre: "WhatsApp Image 2026-09-05 at 19.36.40 (1).jpeg", imagen: "ruanas/WhatsApp Image 2026-09-05 at 19.36.40 (1).jpeg" },
+      { nombre: "WhatsApp Image 2026-09-05 at 19.36.40.jpeg", imagen: "ruanas/WhatsApp Image 2026-09-05 at 19.36.40.jpeg" },
+      { nombre: "WhatsApp Image 2026-09-05 at 19.36.41.jpeg", imagen: "ruanas/WhatsApp Image 2026-09-05 at 19.36.41.jpeg" },
+      { nombre: "WhatsApp Image 2026-09-05 at 19.36.42.jpeg", imagen: "ruanas/WhatsApp Image 2026-09-05 at 19.36.42.jpeg" }
+    ];
+    const ponchosData = [
+      { nombre: "WhatsApp Image 2026-09-05 at 19.54.37.jpeg", imagen: "ponchos/WhatsApp Image 2026-09-05 at 19.54.37.jpeg" },
+      { nombre: "WhatsApp Image 2026-09-05 at 19.54.39 (1).jpeg", imagen: "ponchos/WhatsApp Image 2026-09-05 at 19.54.39 (1).jpeg" },
+      { nombre: "WhatsApp Image 2026-09-05 at 19.54.39.jpeg", imagen: "ponchos/WhatsApp Image 2026-09-05 at 19.54.39.jpeg" },
+      { nombre: "WhatsApp Image 2026-09-05 at 19.54.40 (1).jpeg", imagen: "ponchos/WhatsApp Image 2026-09-05 at 19.54.40 (1).jpeg" },
+      { nombre: "WhatsApp Image 2026-09-05 at 19.54.40.jpeg", imagen: "ponchos/WhatsApp Image 2026-09-05 at 19.54.40.jpeg" }
+    ];
+
+    function renderCatalogo() {
+      catalogoEl.innerHTML = '';
+      productosData.forEach(prod => {
+        const card = document.createElement('div');
+        card.className = 'producto-card';
+
+        // imagen
+        const wrapper = document.createElement('div');
+        wrapper.className = 'imagen-wrapper';
+
+        const img = document.createElement('img');
+        // si existe edición, usamos esa; sino la original
+        const imgSrc = imagenesEditadas.has(prod.id) ? imagenesEditadas.get(prod.id) : prod.imagen;
+        img.src = imgSrc;
+        img.alt = prod.nombre;
+        img.loading = 'lazy';
+        wrapper.appendChild(img);
+
+        // badge editar
+        const editBtn = document.createElement('button');
+        editBtn.className = 'edit-badge';
+        editBtn.innerHTML = '<i class="fas fa-pen"></i> Editar';
+        editBtn.setAttribute('data-id', prod.id);
+        wrapper.appendChild(editBtn);
+
+        // info
+        const nombre = document.createElement('div');
+        nombre.className = 'nombre-producto';
+        nombre.textContent = prod.nombre;
+
+        const precio = document.createElement('div');
+        precio.className = 'precio';
+        precio.textContent = prod.precio;
+
+        const desc = document.createElement('div');
+        desc.className = 'descripcion';
+        desc.textContent = prod.descripcion;
+
+        card.appendChild(wrapper);
+        card.appendChild(nombre);
+        card.appendChild(precio);
+        card.appendChild(desc);
+        catalogoEl.appendChild(card);
+
+        // Evento para abrir modal con el producto
+        editBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = parseInt(editBtn.dataset.id, 10);
+          abrirEditor(id);
+        });
+      });
+    }
+
+    function renderRuanas(files) {
+      catalogoRuanasEl.innerHTML = '';
+      Array.from(files).forEach((file, index) => {
+        const isLocalFile = file instanceof File;
+        const imageName = isLocalFile ? file.name : file.nombre;
+        const imageSource = isLocalFile ? URL.createObjectURL(file) : file.imagen;
+        const card = document.createElement('div');
+        card.className = 'producto-card';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'imagen-wrapper';
+
+        const img = document.createElement('img');
+        img.src = imageSource;
+        img.alt = imageName;
+        img.loading = 'lazy';
+        if (isLocalFile) img.onload = () => URL.revokeObjectURL(img.src);
+        wrapper.appendChild(img);
+
+        const nombre = document.createElement('div');
+        nombre.className = 'nombre-producto';
+        nombre.textContent = imageName;
+
+        const numero = document.createElement('div');
+        numero.className = 'descripcion';
+        numero.textContent = `Ruana ${index + 1}`;
+
+        card.appendChild(wrapper);
+        card.appendChild(nombre);
+        card.appendChild(numero);
+        catalogoRuanasEl.appendChild(card);
+      });
+      estadoRuanas.textContent = files.length === 1
+        ? '1 imagen cargada'
+        : `${files.length} imágenes cargadas`;
+    }
+
+    renderRuanas(ruanasData);
+    renderGaleriaSimple(ponchosData, catalogoPonchosEl, 'Poncho');
+
+    function renderGaleriaSimple(items, catalogo, etiqueta) {
+      catalogo.innerHTML = '';
+      items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'producto-card';
+        card.innerHTML = `
+          <div class="imagen-wrapper">
+            <img src="${item.imagen}" alt="${item.nombre}" loading="lazy">
+          </div>
+          <div class="nombre-producto">${item.nombre}</div>
+          <div class="descripcion">${etiqueta} ${index + 1}</div>
+        `;
+        catalogo.appendChild(card);
+      });
+    }
+
+    inputRuanas.addEventListener('change', (event) => {
+      const files = Array.from(event.target.files).filter(file => file.type.startsWith('image/'));
+      if (files.length) renderRuanas(files);
+      inputRuanas.value = '';
+    });
+
+    // ---------- lógica del editor ----------
+    let productoEnEdicion = null;      // producto actual (objeto)
+    let imagenTemporal = null;        // base64 que se muestra en el modal (puede ser editada)
+    let imagenOriginalProducto = null; // base64 de la imagen original del producto
+
+    const modal = document.getElementById('modalEditar');
+    const modalProductoNombre = document.getElementById('modalProductoNombre');
+    const cropPreview = document.getElementById('cropPreview');
+    const cropPlaceholder = document.getElementById('cropPlaceholder');
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.className = 'file-input-hidden';
+    document.body.appendChild(fileInput);
+
+    // referencias
+    const btnSubir = document.getElementById('btnSubirImagen');
+    const btnRecortar = document.getElementById('btnRecortar');
+    const btnResetear = document.getElementById('btnResetear');
+    const btnAplicar = document.getElementById('btnAplicarEdicion');
+    const btnCerrar = document.getElementById('btnCerrarModal');
+    const toast = document.getElementById('toastMsg');
+
+    function showToast(msg) {
+      toast.textContent = msg || '✓ Imagen actualizada';
+      toast.classList.add('show');
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // Abrir editor para un producto
+    function abrirEditor(productId) {
+      const prod = productosData.find(p => p.id === productId);
+      if (!prod) return;
+      productoEnEdicion = prod;
+      modalProductoNombre.textContent = prod.nombre;
+
+      // carga la imagen actual: si hay editada, usamos esa, sino la original
+      const currentImg = imagenesEditadas.has(prod.id) ? imagenesEditadas.get(prod.id) : prod.imagen;
+      imagenOriginalProducto = prod.imagen; // guardamos la original (url)
+      imagenTemporal = currentImg;
+
+      // mostramos en el preview
+      actualizarPreview(imagenTemporal);
+      modal.classList.add('active');
+    }
+
+    function actualizarPreview(src) {
+      if (src && src !== '') {
+        cropPreview.src = src;
+        cropPreview.style.display = 'block';
+        cropPlaceholder.style.display = 'none';
+      } else {
+        cropPreview.style.display = 'none';
+        cropPlaceholder.style.display = 'flex';
+      }
+    }
+
+    // cerrar modal
+    function cerrarModal() {
+      modal.classList.remove('active');
+      productoEnEdicion = null;
+      imagenTemporal = null;
+      // limpiar input file
+      fileInput.value = '';
+    }
+
+    // ---------- subir imagen ----------
+    btnSubir.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const base64 = ev.target.result;
+        imagenTemporal = base64;
+        actualizarPreview(base64);
+        showToast('Imagen cargada');
+      };
+      reader.readAsDataURL(file);
+      fileInput.value = ''; // reset
+    });
+
+    // ---------- recortar (simulación) ----------
+    btnRecortar.addEventListener('click', () => {
+      if (!imagenTemporal || imagenTemporal === '') {
+        showToast('Primero carga una imagen');
+        return;
+      }
+      // Simulamos un recorte: aplicamos un pequeño efecto (crop centrado)
+      // en realidad solo mostramos un mensaje y "simulamos" recorte aplicando un pequeño cambio visual
+      // Para hacerlo más real, aplicamos un filtro de "recorte" sobre la imagen usando canvas
+      // pero en esta demo hacemos un efecto visual: rotamos ligeramente y mostramos
+      // Podríamos hacer un crop real con canvas, pero para mantenerlo simple y funcional:
+      // Aplicamos un "recorte" simulando que se centra la imagen (en realidad cambiamos el src a un crop con canvas)
+      // Vamos a hacer un recorte real: tomamos la imagen y la recortamos al centro (80% del centro)
+      // Esto demuestra edición real.
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        // Recortar el 80% central
+        const cropWidth = img.width * 0.8;
+        const cropHeight = img.height * 0.8;
+        const offsetX = (img.width - cropWidth) / 2;
+        const offsetY = (img.height - cropHeight) / 2;
+        canvas.width = cropWidth;
+        canvas.height = cropHeight;
+        ctx.drawImage(img, offsetX, offsetY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+        const croppedBase64 = canvas.toDataURL('image/jpeg', 0.92);
+        imagenTemporal = croppedBase64;
+        actualizarPreview(croppedBase64);
+        showToast('Recorte aplicado (80% central)');
+      };
+      img.src = imagenTemporal;
+    });
+
+    // ---------- resetear a imagen original ----------
+    btnResetear.addEventListener('click', () => {
+      if (!productoEnEdicion) return;
+      // restaurar a la imagen original del producto (sin ediciones)
+      imagenTemporal = productoEnEdicion.imagen;
+      actualizarPreview(imagenTemporal);
+      showToast('Restaurada imagen original');
+    });
+
+    // ---------- Aplicar edición (guardar en el estado) ----------
+    btnAplicar.addEventListener('click', () => {
+      if (!productoEnEdicion) return;
+      if (!imagenTemporal) {
+        showToast('No hay imagen para aplicar');
+        return;
+      }
+      // guardamos en el map
+      imagenesEditadas.set(productoEnEdicion.id, imagenTemporal);
+      // actualizar la tarjeta en el catálogo
+      renderCatalogo(); // re-renderiza con las imágenes actualizadas
+      cerrarModal();
+      showToast(`✅ Imagen de "${productoEnEdicion.nombre}" actualizada`);
+    });
+
+    // Cerrar modal con botón
+    btnCerrar.addEventListener('click', cerrarModal);
+    // Cerrar al hacer clic en overlay (fondo)
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) cerrarModal();
+    });
+
+    // Inicializar
+    renderCatalogo();
+
+    // (Opcional) añadir productos adicionales para demostrar
+    // Si se desea, se pueden agregar más, pero con los 4 es suficiente.
+    console.log('Catálogo listo · edita imágenes con recorte');
+  })();
+</script>
+</body>
+</html>
