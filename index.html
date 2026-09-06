@@ -82,6 +82,49 @@
       font-size: 0.9rem;
     }
 
+    .seccion-contacto {
+      margin-top: 4rem;
+      padding: 2rem;
+      background: #0b2b4a;
+      border-radius: 24px;
+      color: white;
+      text-align: center;
+    }
+
+    .seccion-contacto h2 {
+      margin-bottom: 0.5rem;
+    }
+
+    .seccion-contacto p {
+      color: #d7e6f5;
+      margin-bottom: 1.25rem;
+    }
+
+    .contactos-whatsapp {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .contacto-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: 60px;
+      background: #25d366;
+      color: white;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .contacto-whatsapp:hover {
+      background: #1eaf55;
+      transform: translateY(-2px);
+    }
+
     .producto-card {
       background: white;
       border-radius: 24px;
@@ -358,18 +401,18 @@
 <body>
 <div class="app">
   <header>
-    <h1><i class="fas fa-boxes" style="color: #1f5c9e;"></i> Catálogo</h1>
-    <div class="subtitle">Edita las imágenes de cada producto · sube y recorta</div>
+    <h1><i class="fas fa-boxes" style="color: #1f5c9e;"></i> Catálogo Artesanias y sombreros el aguadeño</h1>
+    <div class="subtitle">Catalogo de productos</div>
   </header>
 
   <div class="catalogo" id="catalogo"></div>
 
   <section class="seccion-productos" aria-labelledby="tituloRuanas">
     <h2 id="tituloRuanas"><i class="fas fa-hat-cowboy"></i> Ruanas</h2>
-    <p class="seccion-descripcion">Agrega aquí las imágenes de tus nuevos productos.</p>
-    <div class="acciones-seccion">
+    <p class="seccion-descripcion"></p>
+    <div class="acciones-seccion" style="display:none">
       <label class="btn-crop primary" for="inputRuanas">
-        <i class="fas fa-folder-open"></i> Cargar imágenes de ruanas
+        <i class="fas fa-folder-open"></i>
       </label>
       <input class="input-ruanas" id="inputRuanas" type="file" accept="image/*" multiple webkitdirectory>
       <span class="estado-ruanas" id="estadoRuanas">Aún no hay imágenes cargadas</span>
@@ -381,6 +424,19 @@
     <h2 id="tituloPonchos"><i class="fas fa-mountain"></i> Ponchos</h2>
     <p class="seccion-descripcion">Productos cargados desde la carpeta ponchos.</p>
     <div class="catalogo" id="catalogoPonchos"></div>
+  </section>
+
+  <section class="seccion-contacto" aria-labelledby="tituloContacto">
+    <h2 id="tituloContacto"><i class="fab fa-whatsapp"></i> Contáctanos</h2>
+    <p>Escríbenos por WhatsApp para consultar disponibilidad y precios.</p>
+    <div class="contactos-whatsapp">
+      <a class="contacto-whatsapp" href="https://wa.me/573113625981" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-whatsapp"></i> 311 362 5981
+      </a>
+      <a class="contacto-whatsapp" href="https://wa.me/573147643668" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-whatsapp"></i> 314 764 3668
+      </a>
+    </div>
   </section>
 </div>
 
@@ -422,30 +478,30 @@
   (function() {
     // ----- Datos de ejemplo (catálogo) -----
     const productosData = [
-      { id: 1, nombre: "Costeño quinciano", precio: "$150.000", descripcion: "Cancelación de ruido, 40h batería", imagen: "sombreros/aguadeno .jpeg" },
-      { id: 2, nombre: "Costeño 19", precio: "$220.000", descripcion: "Monitor cardíaco, GPS, resistente", imagen: "sombreros/aguadeno 19.jpeg" },
-      { id: 3, nombre: "Costeño contramarcado 21 vueltas", precio: "$250.000", descripcion: "Sombrero costeño contramarcado original", imagen: "sombreros/aguadeno 21.jpeg" },
-      { id: 4, nombre: "Gamusa bordado", precio: "$35.000", descripcion: "Impermeable, 20L, acolchada", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.54.jpeg" },
-      { id: 5, nombre: "Sombrero paso borcelino", precio: "$85.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.55.jpeg" },
-      { id: 6, nombre: "Sombrero paso copi redondo", precio: "$85.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.56.jpeg" },
-      { id: 7, nombre: "Sombrero paso borsalino alone", precio: "$90.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.57.jpeg" },
-      { id: 8, nombre: "Sombrero paso llanero", precio: "$100.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.58 (1).jpeg" },
+      { id: 1, nombre: "Costeño quinciano", precio: "$150.000", imagen: "sombreros/aguadeno .jpeg" },
+      { id: 2, nombre: "Costeño 19", precio: "$220.000", imagen: "sombreros/aguadeno 19.jpeg" },
+      { id: 3, nombre: "Costeño contramarcado 21 vueltas", precio: "$250.000", imagen: "sombreros/aguadeno 21.jpeg" },
+      { id: 4, nombre: "Gamusa bordado", precio: "$35.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.54.jpeg" },
+      { id: 5, nombre: "Sombrero paso borcelino", precio: "$85.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.55.jpeg" },
+      { id: 6, nombre: "Sombrero paso copi redondo", precio: "$85.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.56.jpeg" },
+      { id: 7, nombre: "Sombrero paso borsalino alone", precio: "$90.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.57.jpeg" },
+      { id: 8, nombre: "Sombrero paso llanero", precio: "$100.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.58 (1).jpeg" },
       ,
-      { id: 10, nombre: "Sombrero Luis Alfonso", precio: "$35.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.59.jpeg" },
-      { id: 11, nombre: "Sombrero Luis Alfonso Negro", precio: "$35.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.00.jpeg" },
-      { id: 12, nombre: "Sombrero Luis Alfonso Rojo", precio: "$35.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.01.jpeg" },
-      { id: 13, nombre: "Sombrero Fieltro alone", precio: "$190.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.02.jpeg" },
-      { id: 14, nombre: "Gorra caña flecha", precio: "$95.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.03 (1).jpeg" },
-      { id: 15, nombre: "Gorra caña flecha", precio: "$95.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.03.jpeg" },
-      { id: 16, nombre: "Sombrero fieltro llanero hats", precio: "230.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.04.jpeg" },
+      { id: 10, nombre: "Sombrero Luis Alfonso", precio: "$35.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.08.59.jpeg" },
+      { id: 11, nombre: "Sombrero Luis Alfonso Negro", precio: "$35.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.00.jpeg" },
+      { id: 12, nombre: "Sombrero Luis Alfonso Rojo", precio: "$35.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.01.jpeg" },
+      { id: 13, nombre: "Sombrero Fieltro alone", precio: "$190.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.02.jpeg" },
+      { id: 14, nombre: "Gorra caña flecha", precio: "$95.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.03 (1).jpeg" },
+      { id: 15, nombre: "Gorra caña flecha", precio: "$95.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.03.jpeg" },
+      { id: 16, nombre: "Sombrero fieltro llanero hats", precio: "230.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.04.jpeg" },
       { id: 17, nombre: "Pava aguadeña fina", precio: "$210.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.05.jpeg" },
-      { id: 18, nombre: "Sombrero aguadeño tejido grueso", precio: "$150.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.06.jpeg" },
-      { id: 19, nombre: "Sombrero fieltro llanero hats beice", precio: "$230.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.07 (1).jpeg" },
-      { id: 20, nombre: "Sombrero gardeliano extra fino", precio: "$320.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.07.jpeg" },
-      { id: 22, nombre: "Sombrero aguadeño borsalino", precio: "$320.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.09.jpeg" },
-      { id: 23, nombre: "Sombrero aguadeño alone", precio: "$250.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.10.jpeg" },
-      { id: 24, nombre: "Sombrero aguadeño alone", precio: "$320.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.11 (1).jpeg" },
-      { id: 25, nombre: "Sombrero costeño quinciano", precio: "$150.000", descripcion: "Imagen local del catálogo", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.11.jpeg" },
+      { id: 18, nombre: "Sombrero aguadeño tejido grueso", precio: "$150.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.06.jpeg" },
+      { id: 19, nombre: "Sombrero fieltro llanero hats beice", precio: "$230.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.07 (1).jpeg" },
+      { id: 20, nombre: "Sombrero gardeliano extra fino", precio: "$320.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.07.jpeg" },
+      { id: 22, nombre: "Sombrero aguadeño borsalino", precio: "$320.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.09.jpeg" },
+      { id: 23, nombre: "Sombrero aguadeño alone", precio: "$250.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.10.jpeg" },
+      { id: 24, nombre: "Sombrero aguadeño alone", precio: "$320.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.11 (1).jpeg" },
+      { id: 25, nombre: "Sombrero costeño quinciano", precio: "$150.000", imagen: "sombreros/WhatsApp Image 2026-09-05 at 19.09.11.jpeg" },
     ];
 
     // Estado de imágenes (base64) por producto: almacenamos la imagen actual
@@ -499,14 +555,10 @@
         precio.className = 'precio';
         precio.textContent = prod.precio;
 
-        const desc = document.createElement('div');
-        desc.className = 'descripcion';
-        desc.textContent = prod.descripcion;
 
         card.appendChild(wrapper);
         card.appendChild(nombre);
         card.appendChild(precio);
-        card.appendChild(desc);
         catalogoEl.appendChild(card);
 
       });
@@ -537,7 +589,6 @@
 
         const numero = document.createElement('div');
         numero.className = 'descripcion';
-        numero.textContent = `Ruana ${index + 1}`;
 
         const precio = document.createElement('div');
         precio.className = 'precio';
@@ -568,7 +619,6 @@
           </div>
           <div class="nombre-producto">${item.nombre}</div>
           <div class="precio">${item.precio || 'Consultar'}</div>
-          <div class="descripcion">${etiqueta} ${index + 1}</div>
         `;
         catalogo.appendChild(card);
       });
