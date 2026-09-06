@@ -119,6 +119,11 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: transform 0.45s ease;
+    }
+
+    .imagen-wrapper:hover img {
+      transform: scale(1.6);
     }
 
     .imagen-placeholder {
@@ -133,37 +138,6 @@
     .imagen-placeholder i {
       font-size: 2.6rem;
       color: #b6cbdf;
-    }
-
-    /* badge de edición */
-    .edit-badge {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(20, 40, 70, 0.75);
-      backdrop-filter: blur(4px);
-      color: white;
-      border: none;
-      border-radius: 40px;
-      padding: 0.4rem 0.9rem 0.4rem 0.7rem;
-      font-size: 0.8rem;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      cursor: pointer;
-      transition: 0.15s;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      letter-spacing: 0.3px;
-    }
-
-    .edit-badge i {
-      font-size: 0.9rem;
-    }
-
-    .edit-badge:hover {
-      background: #1f3a5f;
-      transform: scale(1.02);
     }
 
     .nombre-producto {
@@ -516,13 +490,6 @@
         img.loading = 'lazy';
         wrapper.appendChild(img);
 
-        // badge editar
-        const editBtn = document.createElement('button');
-        editBtn.className = 'edit-badge';
-        editBtn.innerHTML = '<i class="fas fa-pen"></i> Editar';
-        editBtn.setAttribute('data-id', prod.id);
-        wrapper.appendChild(editBtn);
-
         // info
         const nombre = document.createElement('div');
         nombre.className = 'nombre-producto';
@@ -542,12 +509,6 @@
         card.appendChild(desc);
         catalogoEl.appendChild(card);
 
-        // Evento para abrir modal con el producto
-        editBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const id = parseInt(editBtn.dataset.id, 10);
-          abrirEditor(id);
-        });
       });
     }
 
